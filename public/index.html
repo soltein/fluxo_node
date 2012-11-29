@@ -1,0 +1,94 @@
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+        <title>Sistema Fluxo de Caixa</title>
+        <link rel="stylesheet" type="text/css" href="extjs/resources/css/ext-all.css">
+        <script type="text/javascript" src="extjs/ext-all.js"></script>        
+        <script type="text/javascript" src="app/ux/Ext.ux.plugin.FormEnter.js"></script>       
+        <script type="text/javascript">            
+            Ext.onReady(function() {          
+                Ext.QuickTips.init();
+			
+                var dslogin = Ext.create('Ext.FormPanel', {
+                    labelWidth	 : 50, 
+                    url: '/login',
+					//url: 'php/login.php',
+                    frame: true,
+                    defaultType: 'textfield',
+                    monitorValid: true, 
+                    plugins: [{ 
+                            ptype: 'formenter'  
+                        }],
+                    items		 : [{
+                            fieldLabel : 'Login',
+                            name       : 'dslogin',
+                            blankText  : 'Por favor, informe o seu dslogin',
+                            width      : 250,
+                            allowBlank : false 				
+                        },{
+                            fieldLabel : 'Senha',
+                            name       : 'dssenha',
+                            width      : 250,
+                            inputType  : 'password',
+                            blankText  : 'Por favor, informe a sua dssenha',
+                            allowBlank : false 
+                        }],
+                    buttons : [{
+                            text 		: 'Entrar',
+                            formBind 	: true,
+                            handler    : facadslogin 
+                        }]
+                });
+			
+                var win = Ext.create("Ext.Window",{
+                    layout    : 'fit',
+                    title     : 'Sistema Fluxo 0.00001',
+                    width     : 280, 
+                    height    : 140,
+                    y         : 250,
+                    closable  : false, 
+                    resizable : false, 
+                    draggable : false, 
+                    plain     : true, 
+                    border    : false,
+                    items     : [dslogin]
+                }); 
+			
+                win.show(); 	
+
+                function facadslogin() {
+                    if(dslogin.getForm().isValid()){
+                        dslogin.getForm().submit({
+                            method : 'POST',
+                            waitTitle 	: 'Por favor, aguarde!!!',
+                            waitMsg 	: 'Autenticado no Sistema Fluxo 0.00001',
+                            success     : function(){
+                                dslogin.getForm().reset(); 
+                                var redirect = 'principal.html';
+                                window.location = redirect;
+                            },
+                            failure     : function(form, action){
+                                if(action.failureType === 'server'){
+                                    obj = Ext.decode(action.response.responseText);
+                                    Ext.Msg.show({
+                                        title   : 'Erro no dslogin',
+                                        msg     : obj.erro.motivo, 
+                                        buttons : Ext.Msg.OK,
+                                        icon    : Ext.MessageBox.ERROR,
+                                        scope   : this,
+                                        width   : 150
+                                    });
+                                }else{
+                                    Ext.Msg.alert('ERRO NO CLIENTE', 'Passe esta mensagem para o suporte: ' + action.response.responseText);									
+                                }
+                                dslogin.getForm().reset(); 
+                            }					
+                        }); 
+                    }			
+                }
+			
+            });
+        </script>
+    </head>
+    <body></body>
+</html>
